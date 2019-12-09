@@ -148,6 +148,19 @@ int str_checkStorage(int x, int y) {
 //return : 0 - successfully put the package, -1 - failed to put
 int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_SIZE+1], char passwd[PASSWD_LEN+1]) {
 	
+	printf(" - storage row : /n");
+	scanf("%d", &int x);
+	
+	printf(" - storage column : /n");
+	scanf("%d", &int y);
+	
+	if(int x > )
+	
+	printf(" - building # : : /n");
+	scanf("%d", &int nBuilding);
+	
+	printf(" - room # : /n");
+	scanf("%d", &int nRoom);
 }
 
 
