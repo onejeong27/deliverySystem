@@ -52,7 +52,7 @@ static void printStorageInside(int x, int y) {
 static void initStorage(int x, int y) {
 
 	//set all the member variable as an initial value
-	deliverySystem[x][y].building =0;													//??한방에초기화하는 방법  
+	deliverySystem[x][y].building =0;													//??한방에초기화하는 방법, deliverysystem 자체가 포인터니깐 바로 배열 사용 가능?[][]  
 	deliverySystem[x][y].room =0;
 	deliverySystem[x][y].cnt =0;
 	deliverySystem[x][y].passwd[0] ='\0';
@@ -127,7 +127,6 @@ int str_backupSystem(char* filepath) {
 
 //create delivery system on the double pointer deliverySystem
 //char* filepath : filepath and name to read config parameters (row, column, master password, past contexts of the delivery system
-//return : 0 - successfully created, -1 - failed to create the system
 int str_createSystem(char* filepath) {
 	
 	int i;
@@ -140,6 +139,7 @@ int str_createSystem(char* filepath) {
 	if(fp==NULL){
 		//스트림해제 
 		fclose(fp);
+		//failed to create the system
 		return -1;
 	}
 	
@@ -150,7 +150,7 @@ int str_createSystem(char* filepath) {
 	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
 	//각 행에 해당하는 sizesystem[1]개의 열을 가리키는 메모리 할당하여 보관함 만들기 
 	for(i=0;i<systemSize[1];i++){
-		deliverySystem[i] = (storage_t*)malloc(systemSize[1]*sizeof(storage_t));
+		deliverySystem[i] = (storage_t*)malloc(systemSize[1]*sizeof(storage_t));              //??deliverySystem[][]
 	}
 	 
 	//각 보관함을 초기화 해주기 
@@ -159,14 +159,37 @@ int str_createSystem(char* filepath) {
 			initStorage(x,y);
 		}
 	} 
-	
+	//파일 읽어서 택배 내용 저장하기
+	while(feof(fp)!=0){
+		fscanf(fp,"%d %d %d %d %s %s",&x,&y,&deliverySystem[x][y].building,&deliverySystem[x][y].room,&deliverySystem[x][y].passwd,&deliverySystem[x][y].context);								
+														//??내가 원하는 3번쨰 줄부터 읽는 건가? 마스터 비밀번호는 안읽을까 이 문법 가능 할까? 변수 x,y괜찮 ?
+		deliverySystem[x][y].cnt++;
+		storedCnt++;		
+	}
+	fclose(fp);												//??파일이 안닫히는 경우에 함수도 if로 설정해야 하는 것인가 
+	//successfully created
+	return 0; 
 }
 
 //free the memory of the deliverySystem 
 void str_freeSystem(void) {
+	//malloc : 행, 열, context                  //??메모리 해제는 언제 하는 거임?
 	
+	int i,j;
+	
+	//context memory free 
+	for(i=0;i<systemSize[0];i++){
+		for(j=0;j<systemSize[1];j++){
+			free(deliverySystem[i][j].context);
+		}	
+	} 
+	//택배보관함 '열'메모리 free
+	for(j=0;j<systemSize[1];j++){
+		free(deliverySystem[j]);
+	}
+	//택배보관함 '행'메모리 free 
+	free(deliverySystem);
 }
-
 
 
 //print the current state of the whole delivery system (which cells are occupied and the destination of the each occupied cells)
