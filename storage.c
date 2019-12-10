@@ -47,11 +47,22 @@ static void printStorageInside(int x, int y) {
 }
 
 //initialize the storage
-//set all the member variable as an initial value
-//and allocate memory to the context pointer
 //int x, int y : cell coordinate to be initialized
 static void initStorage(int x, int y) {
-	
+
+//set all the member variable as an initial value
+	deliverySystem[x][y].building =0;
+	deliverySystem[x][y].room =0;
+	deliverySystem[x][y].cnt =0;
+	deliverySystem[x][y].passwd[0] ='\0';
+
+//and allocate memory to the context pointer
+	deliverySystem[x][y].context = (char*)malloc(MAX_MSG_SIZE*(sizeof(char));			//char *context를 사용하는 것이 옳은 것인가? 
+	if(deliverySystem[x][y].context == NULL){
+		printf("allocate memory Errors\n");				//메모리가 할당 되지 않은 경우: 오류처리 코드 필요
+		exit(1);  										//return -1
+	}
+	free(deliverySystem[x][y].context); 				// 메모리 반납  
 }
 
 //get password input and check if it is correct for the cell (x,y)
@@ -148,19 +159,7 @@ int str_checkStorage(int x, int y) {
 //return : 0 - successfully put the package, -1 - failed to put
 int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_SIZE+1], char passwd[PASSWD_LEN+1]) {
 	
-	printf(" - storage row : /n");
-	scanf("%d", &int x);
-	
-	printf(" - storage column : /n");
-	scanf("%d", &int y);
-	
-	if(int x > )
-	
-	printf(" - building # : : /n");
-	scanf("%d", &int nBuilding);
-	
-	printf(" - room # : /n");
-	scanf("%d", &int nRoom);
+
 }
 
 
