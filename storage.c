@@ -22,7 +22,8 @@ typedef struct {
 } storage_t;
 
 
-static storage_t** deliverySystem; 			//deliverySystem
+static storage_t** deliverySystem; 			//deliverySystem 
+//??deliverysystem이 이중포인터인 이유는 struct안에 또 password나 context배열이 있기 떄문이라고 생 
 static int storedCnt = 0;					//number of cells occupied
 static int systemSize[2] = {0, 0};  		//row/column of the delivery system
 static char masterPassword[PASSWD_LEN+1];	//master password
@@ -51,7 +52,7 @@ static void printStorageInside(int x, int y) {
 static void initStorage(int x, int y) {
 
 //set all the member variable as an initial value
-	deliverySystem[x][y].building =0;
+	deliverySystem[x][y].building =0;													//??한방에초기화하는 방법  
 	deliverySystem[x][y].room =0;
 	deliverySystem[x][y].cnt =0;
 	deliverySystem[x][y].passwd[0] ='\0';
@@ -67,39 +68,55 @@ static void initStorage(int x, int y) {
 
 //get password input and check if it is correct for the cell (x,y)
 //int x, int y : cell for password check
-//return : 0 - password is matching, -1 - password is not matching
 static int inputPasswd(int x, int y) {
-	char password[PASSWD_LEN+1];														//??이것도 초기화가 필요한가(내생각에는 필요X) 
+	char getpassword[PASSWD_LEN+1];														//??이것도 초기화가 필요한가(내생각에는 필요X) 
 	
 	printf(" - input password for (%d, %d) storage : ", x,y);
-	scanf("%4s",&password);
-	while(getchar() != '\n');														   //??버퍼 비우기 (돈모양 fflush보다 안정강화 버전 )
+	scanf("%4s",&getpassword);
+	while(getchar() != '\n');															 //??버퍼 비우기 (돈모양 fflush보다 안정강화 버전 )
 	
-	if(strcmp(deliverySystem[x][y].passwd,password)==0 || strcmp(deliverySystem[x][y].passwd,)==0)   //??마스터 비밀번호 진짜 짜증난다. 
+//return : 0 - password is matching (마스터비밀번호 또는 저장된 비밀번호)	
+	if(strcmp(deliverySystem[x][y].passwd,getpassword)==0 || strcmp(masterPassword,getpassword)==0)   //??마스터 비밀번호 진짜 짜증난다. 		
 		return 0;
-	
+//return : 0 - password is not matching	
 	else{
 		printf(" -----------> password is wrong!!/n -----------> Failed to extract my package!")
 	} 
 		return -1;
-	 
-	
-	
-	
-	
 }
-
-
 
 
 
 // ------- API function for main.c file ---------------
 
 //backup the delivery system context to the file system
-//char* filepath : filepath and name to write
-//return : 0 - backup was successfully done, -1 - failed to backup
+//char* filepath : filepath and name to write                           //??name to write는 무슨 뜻일까  
 int str_backupSystem(char* filepath) {
 	
+	FILE *fp = fopen(filepath,"w");                                   //??읽고 쓰기 모드 모두다 가능해야 하는 거 아님? 
+
+//return -1 : failed to backup(스트림 생성 실패)	                 //??파일열기 실패도 알려줘야 하나? 이건 어떻게 확인하지ㅋ 진짜 내머리는 장식용  
+	if(fp==NULL){
+		//스트림해제 
+		fclose(fp);
+		return -1;
+	}
+//return : 0 - backup was successfully done(파일에 systemsize,masterpassword,deliverySystem내용  쓰기)	
+	fprintf(fp,"%d %d\n", systemSize[0], systemSize[1]);
+	fprintf(fp,"%s\n", masterPassword);
+	
+	int i,j;
+	for(i=0;i<systemSize[0];i++){
+		for(j=0;j<systemSize[1];j++){
+			if (deliverySystem[i][j].cnt>0)
+				fprintf(pf,"%d %d %d %d %s %s\n", i, j, deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd, deliverySystem[i][j].context);
+		}
+	}
+	
+	//스트림해제 
+	fclose(pf);
+	
+	return 0; 	
 }
 
 
