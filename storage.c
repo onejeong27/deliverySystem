@@ -57,18 +57,35 @@ static void initStorage(int x, int y) {
 	deliverySystem[x][y].passwd[0] ='\0';
 
 //and allocate memory to the context pointer
-	deliverySystem[x][y].context = (char*)malloc(MAX_MSG_SIZE*(sizeof(char));			//char *context를 사용하는 것이 옳은 것인가? 
+	deliverySystem[x][y].context = (char*)malloc(MAX_MSG_SIZE*(sizeof(char));			//??char *context를 사용하는 것이 옳은 것인가? 
 	if(deliverySystem[x][y].context == NULL){
-		printf("allocate memory Errors\n");				//메모리가 할당 되지 않은 경우: 오류처리 코드 필요
-		exit(1);  										//return -1
+		printf("allocate memory Errors\n");												//메모리가 할당 되지 않은 경우: 오류처리 코드 필요
+		exit(1);  																		//??return -1
 	}
-	free(deliverySystem[x][y].context); 				// 메모리 반납  
+	free(deliverySystem[x][y].context); 												// 메모리 반납  
 }
 
 //get password input and check if it is correct for the cell (x,y)
 //int x, int y : cell for password check
 //return : 0 - password is matching, -1 - password is not matching
 static int inputPasswd(int x, int y) {
+	char password[PASSWD_LEN+1];														//??이것도 초기화가 필요한가(내생각에는 필요X) 
+	
+	printf(" - input password for (%d, %d) storage : ", x,y);
+	scanf("%4s",&password);
+	while(getchar() != '\n');														   //??버퍼 비우기 (돈모양 fflush보다 안정강화 버전 )
+	
+	if(strcmp(deliverySystem[x][y].passwd,password)==0 || strcmp(deliverySystem[x][y].passwd,)==0)   //??마스터 비밀번호 진짜 짜증난다. 
+		return 0;
+	
+	else{
+		printf(" -----------> password is wrong!!/n -----------> Failed to extract my package!")
+	} 
+		return -1;
+	 
+	
+	
+	
 	
 }
 
