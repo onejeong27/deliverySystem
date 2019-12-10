@@ -65,7 +65,7 @@ static void initStorage(int x, int y) {
 		exit(1);  																		//??return -1: 무슨 종료가 옳은 것일까  
 	}
 	//메모리 반납  
-	free(deliverySystem[x][y].context); 												//??생각해보니 여기서는 메모리 반납이 필요 없지 않나  
+	//free(deliverySystem[x][y].context); 												//??생각해보니 여기서는 메모리 반납이 필요 없지 않나  
 }
 
 //get password input and check if it is correct for the cell (x,y)
@@ -130,11 +130,13 @@ int str_backupSystem(char* filepath) {
 //return : 0 - successfully created, -1 - failed to create the system
 int str_createSystem(char* filepath) {
 	
+	int i;
+	int x,y; 
 	
 	//읽기모드로 파일여는 스트림 생성
 	FILE *fp = fopen(filepath,"r");
 	
-	//파일 안열림 
+	//파일 안열리는 경우  
 	if(fp==NULL){
 		//스트림해제 
 		fclose(fp);
@@ -144,10 +146,19 @@ int str_createSystem(char* filepath) {
 	fscanf(fp,"%d %d",&systemSize[0],&systemSize[1]);
 	fscanf(fp,"%s",masterPassword);
 	
-	deliverySystem
-	
-	
+	//sizesystem[0]개의 행을 가리키는 메모리 할당하여 보관함 만들기  
+	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
+	//각 행에 해당하는 sizesystem[1]개의 열을 가리키는 메모리 할당하여 보관함 만들기 
+	for(i=0;i<systemSize[1];i++){
+		deliverySystem[i] = (storage_t*)malloc(systemSize[1]*sizeof(storage_t));
+	}
 	 
+	//각 보관함을 초기화 해주기 
+	for(x=0;x<systemSize[0];x++){
+		for (y=0;y<systemSize[1];y++){
+			initStorage(x,y);
+		}
+	} 
 	
 }
 
