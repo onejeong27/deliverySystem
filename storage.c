@@ -139,7 +139,7 @@ int str_createSystem(char* filepath) {
 	//sizesystem[0]개의 행을 가리키는 메모리 할당하여 보관함 만들기                   //??메모리할당 오류 필요한가  
 	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
 	//각 행에 해당하는 sizesystem[1]개의 열을 가리키는 메모리 할당하여 보관함 만들기 
-	for(i=0;i<systemSize[1];i++){
+	for(i=0;i<systemSize[0];i++){  
 		deliverySystem[i] = (storage_t*)malloc(systemSize[1]*sizeof(storage_t));            
 	}
 
@@ -150,10 +150,32 @@ int str_createSystem(char* filepath) {
 		}
 	} 
 
-	//파일 읽어서 택배 내용 저장하기
-	while(feof(fp)!=0){
+	//파일 읽어서 택배보관함에  내용 저장하기
+	while(feof(fp)!=0){ //여기안돔 다른방법으로 해보세요!  
+	
+		char getcontext[MAX_MSG_SIZE+1];
+		char length;
+		//행과 열 읽기(택배보관함) 
+		fscanf(fp,"%d %d", &x, &y);
+		printf("x:%d, y:%d\n",x,y);
+		//시스템 내용 읽기
+		fscanf(fp,"%d %d %s %s",&deliverySystem[x][y].building,&deliverySystem[x][y].room,deliverySystem[x][y].passwd,getcontext);
+		//문자열길이+1(공백글자)  
+		length =strlen(getcontext)+1;              
+		//문자열 길이만큼 메모리 할당 
+		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);	//공백글자도 char형 좋은건가		
+		
+//???	//메모리가 할당되지 않은 경우: 오류처리 코드 필요(??안하는 게 나을까 메인에 오류이면 메세지 있긴 함)                                    
+		if(deliverySystem[x][y].context == NULL){
+		printf("allocate memory Errors\n");              	
+		return -1;}
+		
+		deliverySystem[x][y].cnt++;
+		storedCnt++;
 
-//??????????????????????		
+	}
+/*	while(feof(fp)!=0){
+		
 		char length;
 		//행과 열 읽기(택배보관함) 
 		fscanf(fp,"%d %d", &x, &y);
@@ -171,7 +193,7 @@ int str_createSystem(char* filepath) {
 		
 		deliverySystem[x][y].cnt++;
 		storedCnt++;		
-	}
+	}*/
 	fclose(fp);											 
 	//successfully created
 	return 0; 
@@ -309,17 +331,14 @@ int str_extractStorage(int x, int y) {
 int str_findStorage(int nBuilding, int nRoom) {
 	
 	int x,y;
-	int cnt;
+	int cnt = 0;
 	 
 	for(x=0;x<systemSize[0];x++){
 		for(y=0;y<systemSize[1];y++){
-			if(deliverySystem[x][y].building == nBuilding && deliverySystem[x][y].room == nRoom){
-				cnt = deliverySystem[x][y].cnt;
-				if(cnt!=0)				
-					printf(" -----------> Found a package in (%d, %d)", &x,&y);		
-				else return cnt;
+			if(deliverySystem[x][y].building == nBuilding && deliverySystem[x][y].room == nRoom)				
+					printf(" -----------> Found a package in (%d, %d)", &x,&y);	
+					cnt++;			
 			}
 		}
-	}	
-//	return cnt;                
-}
+	return cnt;
+	}	                
