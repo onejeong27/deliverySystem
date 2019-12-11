@@ -58,7 +58,7 @@ static void initStorage(int x, int y) {
 	deliverySystem[x][y].passwd[0] ='\0';
 
 	//and allocate memory to the context pointer
-	deliverySystem[x][y].context = (char*)malloc((sizeof(char)*MAX_MSG_SIZE);			//??char *context를 사용하는 것이 옳은 것인가? 문자하나에 char하나? 
+	deliverySystem[x][y].context = (char*)malloc(sizeof(char)*MAX_MSG_SIZE);			//??char *context를 사용하는 것이 옳은 것인가? 문자하나에 char하나? 
 	//메모리가 할당되지 않은 경우: 오류처리 코드 필요                                   //??확인방법 
 	if(deliverySystem[x][y].context == NULL){
 		printf("allocate memory Errors\n");												
@@ -82,9 +82,8 @@ static int inputPasswd(int x, int y) {
 	if(strcmp(deliverySystem[x][y].passwd,getpassword)==0 || strcmp(masterPassword,getpassword)==0)   //??마스터 비밀번호 진짜 짜증난다. 		
 		return 0;
 	//return : 0 - password is not matching	
-	else{
-		printf(" -----------> password is wrong!!/n -----------> Failed to extract my package!")
-	} 
+	else
+		printf(" -----------> password is wrong!!/n -----------> Failed to extract my package!");
 		return -1;
 }
 
@@ -113,12 +112,12 @@ int str_backupSystem(char* filepath) {
 	for(i=0;i<systemSize[0];i++){
 		for(j=0;j<systemSize[1];j++){
 			if (deliverySystem[i][j].cnt>0)
-				fprintf(pf,"%d %d %d %d %s %s\n", i, j, deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd, deliverySystem[i][j].context);
+				fprintf(fp,"%d %d %d %d %s %s\n", i, j, deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd, deliverySystem[i][j].context);
 		}
 	}
 	
 	//스트림해제 
-	fclose(pf);
+	fclose(fp);
 	
 	return 0; 	
 }
@@ -267,7 +266,7 @@ int str_extractStorage(int x, int y) {
 //print all the cells (x,y) which has my package
 //int nBuilding, int nRoom : my building/room numbers
 //return : number of packages that the storage system has
-int str_findStorage(int nBuilding, int nRoom) {
+/*int str_findStorage(int nBuilding, int nRoom) {
 	
 	return cnt;
-}
+}*/
