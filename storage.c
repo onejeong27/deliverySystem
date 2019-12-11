@@ -246,27 +246,55 @@ int str_checkStorage(int x, int y) {
 //int nBuilding, int nRoom : building and room numbers of the destination
 //char msg[] : package context (message string)
 //char passwd[] : password string (4 characters)
-//return : 0 - successfully put the package, -1 - failed to put
 int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_SIZE+1], char passwd[PASSWD_LEN+1]) {
 	
-
+	//입력받은 내용 넣어 주기  
+	deliverySystem[x][y].building = nBuilding;
+	deliverySystem[x][y].room = nRoom;
+	strcpy(deliverySystem[x][y].passwd,passwd[PASSWD_LEN+1]);
+	strcpy(deliverySystem[x][y].context,msg[MAX_MSG_SIZE+1]);             //??내용의 사이즈만큼 메모리를 할당해주는 게 더 좋은거 아닌가?? 
+	
+	//?? 오류를 판단할수 있는 기준이 뭘까 아하 초기값은 빵이다! 한방에 쓸쑤 있는 방법은 	
+	if(deliverySystem[x][y].building=0 || deliverySystem[x][y].room=0 || deliverySystem[x][y].passwd[0]='\0' || deliverySystem[x][y].context == NULL)
+	//successfully put the package
+	return 0;
+	//failed to put
+	else return -1;
 }
 
 
 
 //extract the package context with password checking
-//after password checking, then put the msg string on the screen and re-initialize the storage
 //int x, int y : coordinate of the cell to extract
-//return : 0 - successfully extracted, -1 = failed to extract
 int str_extractStorage(int x, int y) {
 	
+	//password checking
+	inputPasswd(int x, int y);
+	
+	//put the msg string on the screen and re_initialize the storage 
+	if(inputPasswd = 0){
+		printStorageInside(int x, int y);
+		initStorage(int x, int y);
+		//successfully extracted
+		return 0;
+	}
+	//failed to extract
+	else return -1;
 }
 
 //find my package from the storage
 //print all the cells (x,y) which has my package
 //int nBuilding, int nRoom : my building/room numbers
 //return : number of packages that the storage system has
-/*int str_findStorage(int nBuilding, int nRoom) {
+int str_findStorage(int nBuilding, int nRoom) {
+	
+	int x,y;
+	int cnt;
+	
+	if(deliverySystem[x][y].building = nBuilding && deliverySystem[x][y].room = nRoom){
+		printf(" -----------> Found a package in (%d, %d)", &x,&y)
+		cnt++;
+	}
 	
 	return cnt;
-}*/
+}
