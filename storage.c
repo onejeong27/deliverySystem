@@ -51,20 +51,12 @@ static void printStorageInside(int x, int y) {
 static void initStorage(int x, int y) {
 
 	//set all the member variable as an initial value
-	deliverySystem[x][y].building =0;													//deliverysystem 자체가 포인터니깐 바로 배열 사용 가능?[][]  
+	deliverySystem[x][y].building =0;													 
 	deliverySystem[x][y].room =0;
 	deliverySystem[x][y].cnt =0;
 	deliverySystem[x][y].passwd[0] ='\0';
+	deliverySystem[x][y].context = NULL;
 
-/*	
-	deliverySystem[x][y].context = (char*)malloc(sizeof(char)*MAX_MSG_SIZE);			//??char *context를 사용하는 것이 옳은 것인가? 문자하나에 char하나? 
-	//메모리가 할당되지 않은 경우: 오류처리 코드 필요                                   //??확인방법 공백을 포함해서 글자 세주기  
-	if(deliverySystem[x][y].context == NULL){
-		printf("allocate memory Errors\n");												
-		exit(1);  																		//??return -1: 무슨 종료가 옳은 것일까  
-	}
-	메모리 반납  
-	free(deliverySystem[x][y].context); */												//??생각해보니 여기서는 메모리 반납이 필요 없지 않나  
 }
 
 //get password input and check if it is correct for the cell (x,y)
@@ -144,34 +136,37 @@ int str_createSystem(char* filepath) {
 	fscanf(fp,"%d %d",&systemSize[0],&systemSize[1]);
 	fscanf(fp,"%s",masterPassword);
 	
-	//sizesystem[0]개의 행을 가리키는 메모리 할당하여 보관함 만들기                   //??메모리할당 오류  
+	//sizesystem[0]개의 행을 가리키는 메모리 할당하여 보관함 만들기                   //??메모리할당 오류 필요한가  
 	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
 	//각 행에 해당하는 sizesystem[1]개의 열을 가리키는 메모리 할당하여 보관함 만들기 
 	for(i=0;i<systemSize[1];i++){
 		deliverySystem[i] = (storage_t*)malloc(systemSize[1]*sizeof(storage_t));            
 	}
-	 
+
 	//각 보관함을 초기화 해주기 
 	for(x=0;x<systemSize[0];x++){
 		for (y=0;y<systemSize[1];y++){
 			initStorage(x,y);
 		}
 	} 
+
 	//파일 읽어서 택배 내용 저장하기
 	while(feof(fp)!=0){
-		
+
+//??????????????????????		
+		char length;
 		//행과 열 읽기(택배보관함) 
 		fscanf(fp,"%d %d", &x, &y);
-		//시스템 내용 읽기 
+		//시스템 내용 읽기 ?????저장하려면 메모리 자체가 필요 어디선가(파일에서 크기 읽자) 
 		fscanf(fp,"%d %d %s %s",&deliverySystem[x][y].building,&deliverySystem[x][y].room,&deliverySystem[x][y].passwd,&deliverySystem[x][y].context);								
-//*********문자열길이+1(공백글자)  
-		length =strlen(deliverySystem[x][y].context)+1;             //sizeof와strlen 
+		//문자열길이+1(공백글자)  
+		length =strlen(deliverySystem[x][y].context)+1;              
 		//문자열 길이만큼 메모리 할당 
 		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);	//공백글자도 char형 좋은건가		
 		
-		//메모리가 할당되지 않은 경우: 오류처리 코드 필요                                    
+//???	//메모리가 할당되지 않은 경우: 오류처리 코드 필요(??안하는 게 나을까 메인에 오류이면 메세지 있긴 함)                                    
 		if(deliverySystem[x][y].context == NULL){
-		printf("allocate memory Errors\n");              //??안하는 게 나을까 메인에 오류이면 메세지 있긴 함	
+		printf("allocate memory Errors\n");              	
 		return -1;}
 		
 		deliverySystem[x][y].cnt++;
@@ -184,7 +179,7 @@ int str_createSystem(char* filepath) {
 
 //free the memory of the deliverySystem 
 void str_freeSystem(void) {                  
-	//free랑 create는 완전 반대 개념
+	
 	int i,j;
 	
 	//deliverysystem.context memory free(주소등은 버릴 필요 없는 건가)  
@@ -193,8 +188,7 @@ void str_freeSystem(void) {
 			if(deliverySystem[i][j].cnt != 0)
 			   free(deliverySystem[i][j].context);}	
 	}
-
-//?????????????????????????????/????????????????????????????	
+	
 	//택배보관함 '열'메모리 free
 	for(j=0;j<systemSize[1];j++){
 		free(deliverySystem[j]);
@@ -261,23 +255,29 @@ int str_checkStorage(int x, int y) {
 //char passwd[] : password string (4 characters)
 int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_SIZE+1], char passwd[PASSWD_LEN+1]) {
 	
+	char length;
+	
 	//입력받은 내용 넣어 주기  
 	deliverySystem[x][y].building = nBuilding;
 	deliverySystem[x][y].room = nRoom;
-	strcpy(deliverySystem[x][y].passwd,passwd[PASSWD_LEN+1]);
-	strcpy(deliverySystem[x][y].context,msg[MAX_MSG_SIZE+1]);             //??내용의 사이즈만큼 메모리를 할당해주는 게 더 좋은거 아닌가?? 내가 맞았따 나 좀 잘하는  
+	strcpy(deliverySystem[x][y].passwd,passwd);
 	
-	//문자열 크기만큼 메모리 할당 
-	length = strlen(deliverySystem[x][y].context)+1;             //sizeof와strlen 
+	//문자열 길이+1(공백글자) 
+	length = strlen(msg)+1;
+	
 	//문자열 길이만큼 메모리 할당 
-	deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);	//공백글자도 char형 좋은건가
+	deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);
 	
+	//할당해주고 copy 
+	strcpy(deliverySystem[x][y].context,msg);               
+	              
 	//오류를 판단하기(deliverySystem의 갑은 초기화상태) 	
-	if(deliverySystem[x][y].building=0 || deliverySystem[x][y].room=0 || deliverySystem[x][y].passwd[0]='\0' || deliverySystem[x][y].context == NULL)
+	if(deliverySystem[x][y].building==0 || deliverySystem[x][y].room ==0 || deliverySystem[x][y].passwd == NULL || deliverySystem[x][y].context == NULL)
 		//successfully put the package
-		return 0;
-	//failed to put
-	else return -1;
+		return 0;	
+	else 
+		//failed to put
+		return -1;
 }
 
 
@@ -287,14 +287,14 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 int str_extractStorage(int x, int y) {
 	
 	//password checking
-	inputPasswd(int x, int y);
+	inputPasswd(x,y);
 	
 	//put the msg string on the screen and re_initialize the storage 
-	if(inputPasswd = 0){
-		printStorageInside(int x, int y);
-		initStorage(int x, int y);
-//?????		//.context memory free 
-		free(deliverySystem[int x][int y].context);
+	if(inputPasswd == 0){
+		printStorageInside(x,y);
+		initStorage(x,y);
+	//.context memory free 
+		free(deliverySystem[x][y].context);
 		//successfully extracted
 		return 0;
 	}
@@ -313,9 +313,9 @@ int str_findStorage(int nBuilding, int nRoom) {
 	 
 	for(x=0;x<systemSize[0];x++){
 		for(y=0;y<systemSize[1];y++){
-			if(deliverySystem[x][y].building = nBuilding && deliverySystem[x][y].room = nRoom){
+			if(deliverySystem[x][y].building == nBuilding && deliverySystem[x][y].room == nRoom){
 				cnt = deliverySystem[x][y].cnt;
-				if(cnt!=0){				
+				if(cnt!=0)				
 					printf(" -----------> Found a package in (%d, %d)", &x,&y);		
 				else return cnt;
 			}
