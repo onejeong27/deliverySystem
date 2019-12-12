@@ -148,7 +148,7 @@ int str_createSystem(char* filepath) {
 	} 
 
 	//파일 읽어서 택배보관함에  내용 저장하기
-	while(!feof(fp)){ //여기안돔 다른방법으로 해보세요!  
+	while(!feof(fp)){   
 	
 		char getcontext[MAX_MSG_SIZE+1];
 		char length;
@@ -161,13 +161,13 @@ int str_createSystem(char* filepath) {
 		//문자열 길이만큼 메모리 할당 
 		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);	//공백글자도 char형 좋은건가		
 		
-		//메모리가 할당되지 않은 경우                                    
+/*		//메모리가 할당되지 않은 경우                                    
 		if(deliverySystem[x][y].context == NULL){
 		printf("allocate memory Errors\n");              	
-		return -1;}
+		return -1;}*/
 		
 		deliverySystem[x][y].cnt++;
-		storedCnt++;
+		storedCnt++;          //공백글자를 자꾸 카운트함 시불탱  
 
 	}
 	fclose(fp);											 
@@ -284,14 +284,12 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 //int x, int y : coordinate of the cell to extract
 int str_extractStorage(int x, int y) {
 	
-	//password checking
-	inputPasswd(x,y);
-	
-	//put the msg string on the screen and re_initialize the storage 
-	if(inputPasswd == 0){
+	//password checking	
+	if(inputPasswd(x,y)== 0){
+		//put the msg string on the screen and re_initialize the storage 
 		printStorageInside(x,y);
 		initStorage(x,y);
-	//.context memory free 
+		//.context memory free 
 		free(deliverySystem[x][y].context);
 		//successfully extracted
 		return 0;
