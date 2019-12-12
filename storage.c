@@ -66,8 +66,8 @@ static int inputPasswd(int x, int y) {
 	
 	printf(" - input password for (%d, %d) storage : ", x,y);
 	scanf("%4s",&getpassword);
-	//enter로인한 버퍼 비우기  
-	while(getchar() != '\n');															 //??버퍼 비우기: fflush(stdin)보다 안정강화 버전
+	//enter로인한 버퍼 비우기 
+	fflush(stdin);														 
 	
 	//password is matching (마스터비밀번호 또는 저장된 비밀번호)	
 	if(strcmp(deliverySystem[x][y].passwd,getpassword)==0 || strcmp(masterPassword,getpassword)==0)    		
@@ -89,10 +89,9 @@ int str_backupSystem(char* filepath) {
 	//쓰기 모드로 파일여는 스트림 형성 
 	FILE *fp = fopen(filepath,"w");                                   
 
-	//failed to backup(스트림 생성 실패)	    //??파일열기 실패도 알려줘야 하나? 이건 어떻게 확인하지ㅋ 진짜 내머리는 장식용.오류메세지는 메인에 존재  
+	//failed to backup(스트림 생성 실패)	   
 	if(fp==NULL){
 		//스트림해제 
-		fclose(fp);
 		return -1;														 
 	}
 	//backup was successfully done(파일에 systemsize,masterpassword,deliverySystem내용  쓰기)	
@@ -126,9 +125,7 @@ int str_createSystem(char* filepath) {
 	FILE *fp = fopen(filepath,"r");
 	
 	//파일 안열리는 경우  
-	if(fp==NULL){
-		//스트림해제													//??확인할 수 있는 방법은 없을까? 
-		fclose(fp);
+	if(fp==NULL){												 
 		//failed to create the system
 		return -1;
 	}
@@ -136,7 +133,7 @@ int str_createSystem(char* filepath) {
 	fscanf(fp,"%d %d",&systemSize[0],&systemSize[1]);
 	fscanf(fp,"%s",masterPassword);
 	
-	//sizesystem[0]개의 행을 가리키는 메모리 할당하여 보관함 만들기                   //??메모리할당 오류 필요한가  
+	//sizesystem[0]개의 행을 가리키는 메모리 할당하여 보관함 만들기                     
 	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
 	//각 행에 해당하는 sizesystem[1]개의 열을 가리키는 메모리 할당하여 보관함 만들기 
 	for(i=0;i<systemSize[0];i++){  
@@ -151,13 +148,12 @@ int str_createSystem(char* filepath) {
 	} 
 
 	//파일 읽어서 택배보관함에  내용 저장하기
-	while(feof(fp)!=0){ //여기안돔 다른방법으로 해보세요!  
+	while(!feof(fp)){ //여기안돔 다른방법으로 해보세요!  
 	
 		char getcontext[MAX_MSG_SIZE+1];
 		char length;
 		//행과 열 읽기(택배보관함) 
 		fscanf(fp,"%d %d", &x, &y);
-		printf("x:%d, y:%d\n",x,y);
 		//시스템 내용 읽기
 		fscanf(fp,"%d %d %s %s",&deliverySystem[x][y].building,&deliverySystem[x][y].room,deliverySystem[x][y].passwd,getcontext);
 		//문자열길이+1(공백글자)  
@@ -165,7 +161,7 @@ int str_createSystem(char* filepath) {
 		//문자열 길이만큼 메모리 할당 
 		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);	//공백글자도 char형 좋은건가		
 		
-//???	//메모리가 할당되지 않은 경우: 오류처리 코드 필요(??안하는 게 나을까 메인에 오류이면 메세지 있긴 함)                                    
+		//메모리가 할당되지 않은 경우                                    
 		if(deliverySystem[x][y].context == NULL){
 		printf("allocate memory Errors\n");              	
 		return -1;}
@@ -174,26 +170,6 @@ int str_createSystem(char* filepath) {
 		storedCnt++;
 
 	}
-/*	while(feof(fp)!=0){
-		
-		char length;
-		//행과 열 읽기(택배보관함) 
-		fscanf(fp,"%d %d", &x, &y);
-		//시스템 내용 읽기 ?????저장하려면 메모리 자체가 필요 어디선가(파일에서 크기 읽자) 
-		fscanf(fp,"%d %d %s %s",&deliverySystem[x][y].building,&deliverySystem[x][y].room,&deliverySystem[x][y].passwd,&deliverySystem[x][y].context);								
-		//문자열길이+1(공백글자)  
-		length =strlen(deliverySystem[x][y].context)+1;              
-		//문자열 길이만큼 메모리 할당 
-		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);	//공백글자도 char형 좋은건가		
-		
-//???	//메모리가 할당되지 않은 경우: 오류처리 코드 필요(??안하는 게 나을까 메인에 오류이면 메세지 있긴 함)                                    
-		if(deliverySystem[x][y].context == NULL){
-		printf("allocate memory Errors\n");              	
-		return -1;}
-		
-		deliverySystem[x][y].cnt++;
-		storedCnt++;		
-	}*/
 	fclose(fp);											 
 	//successfully created
 	return 0; 
