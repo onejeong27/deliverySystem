@@ -70,11 +70,11 @@ static int inputPasswd(int x, int y) {
 	fflush(stdin);														 
 	
 	//password is matching (마스터비밀번호 또는 저장된 비밀번호)	
-	if(strcmp(deliverySystem[x][y].passwd,getpassword)==0 || strcmp(masterPassword,getpassword)==0)    		
+	if(strcmp(deliverySystem[x][y].passwd,getpassword)==0 || strcmp(masterPassword,getpassword) ==0)    		
 		return 0;
 	//password is not matching	
 	else
-		printf(" -----------> password is wrong!!/n -----------> Failed to extract my package!");
+		printf(" -----------> password is wrong!!\n");
 		return -1;
 }
 
@@ -158,16 +158,15 @@ int str_createSystem(char* filepath) {
 		fscanf(fp,"%d %d %s %s",&deliverySystem[x][y].building,&deliverySystem[x][y].room,deliverySystem[x][y].passwd,getcontext);
 		//문자열길이+1(공백글자)  
 		length =strlen(getcontext)+1;              
-		//문자열 길이만큼 메모리 할당 
+		//문자열 길이만큼 메모리 할당하고 내용 복사하기 
 		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);
 		strcpy(deliverySystem[x][y].context,getcontext);
-					
-				
+									
 		deliverySystem[x][y].cnt++;
 		storedCnt++;
 	}
 	//StoredCnt세주기(while문 안에 있을 떄,마지막 \n 를 뺌)  
-//	storedCnt--;
+	//storedCnt--;
 	fclose(fp);											 
 
 	//successfully created	
@@ -179,7 +178,7 @@ void str_freeSystem(void) {
 	
 	int i,j;
 	
-	//deliverysystem.context memory free(주소등은 버릴 필요 없는 건가)  
+	//deliverysystem.context memory free
 	for(i=0;i<systemSize[0];i++){
 		for(j=0;j<systemSize[1];j++){
 			if(deliverySystem[i][j].cnt != 0)
@@ -268,7 +267,7 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 	//할당해주고 copy 
 	strcpy(deliverySystem[x][y].context,msg);               
 	              
-	//오류를 판단하기(deliverySystem의 갑은 초기화상태) 	
+	//오류를 판단하기(deliverySystem의 값은 초기화상태) 	
 	if(deliverySystem[x][y].building==0 || deliverySystem[x][y].room ==0 || deliverySystem[x][y].passwd == NULL || deliverySystem[x][y].context == NULL)
 		//failed to put
 		return -1;	
@@ -310,7 +309,8 @@ int str_findStorage(int nBuilding, int nRoom) {
 	
 	int x,y;
 	int cnt = 0;
-	 
+	
+	//모든보관함에서 입력한 주소랑 일치하는 지 확인하기	 
 	for(x=0;x<systemSize[0];x++){
 		for(y=0;y<systemSize[1];y++){
 			if(deliverySystem[x][y].building == nBuilding && deliverySystem[x][y].room == nRoom){				
