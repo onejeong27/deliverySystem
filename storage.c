@@ -151,7 +151,7 @@ int str_createSystem(char* filepath) {
 	while(!feof(fp)){   
 	
 		char getcontext[MAX_MSG_SIZE+1];
-		char length;
+		int length;
 		//행과 열 읽기(택배보관함) 
 		fscanf(fp,"%d %d", &x, &y);
 		//시스템 내용 읽기
@@ -159,19 +159,18 @@ int str_createSystem(char* filepath) {
 		//문자열길이+1(공백글자)  
 		length =strlen(getcontext)+1;              
 		//문자열 길이만큼 메모리 할당 
-		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);	//공백글자도 char형 좋은건가		
-		
-/*		//메모리가 할당되지 않은 경우                                    
-		if(deliverySystem[x][y].context == NULL){
-		printf("allocate memory Errors\n");              	
-		return -1;}*/
-		
+		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*length);
+		strcpy(deliverySystem[x][y].context,getcontext);
+					
+				
 		deliverySystem[x][y].cnt++;
-		storedCnt++;          //공백글자를 자꾸 카운트함 시불탱  
-
+		storedCnt++;
 	}
+	//StoredCnt세주기(while문 안에 있을 떄,마지막 \n 를 뺌)  
+//	storedCnt--;
 	fclose(fp);											 
-	//successfully created
+
+	//successfully created	
 	return 0; 
 }
 
@@ -271,11 +270,14 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 	              
 	//오류를 판단하기(deliverySystem의 갑은 초기화상태) 	
 	if(deliverySystem[x][y].building==0 || deliverySystem[x][y].room ==0 || deliverySystem[x][y].passwd == NULL || deliverySystem[x][y].context == NULL)
-		//successfully put the package
-		return 0;	
-	else 
 		//failed to put
-		return -1;
+		return -1;	
+	else {
+		deliverySystem[x][y].cnt++;
+		storedCnt++;
+		return 0;
+	}
+
 }
 
 
@@ -291,6 +293,8 @@ int str_extractStorage(int x, int y) {
 		initStorage(x,y);
 		//.context memory free 
 		free(deliverySystem[x][y].context);
+		//storedCnt 빼주기
+		storedCnt--;  
 		//successfully extracted
 		return 0;
 	}
@@ -309,9 +313,9 @@ int str_findStorage(int nBuilding, int nRoom) {
 	 
 	for(x=0;x<systemSize[0];x++){
 		for(y=0;y<systemSize[1];y++){
-			if(deliverySystem[x][y].building == nBuilding && deliverySystem[x][y].room == nRoom)				
-					printf(" -----------> Found a package in (%d, %d)", &x,&y);	
-					cnt++;			
+			if(deliverySystem[x][y].building == nBuilding && deliverySystem[x][y].room == nRoom){				
+					printf(" -----------> Found a package in (%d, %d)\n", x,y);	
+					cnt++;}					
 			}
 		}
 	return cnt;
