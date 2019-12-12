@@ -96,13 +96,13 @@ int str_backupSystem(char* filepath) {
 	}
 	//backup was successfully done(파일에 systemsize,masterpassword,deliverySystem내용  쓰기)	
 	fprintf(fp,"%d %d\n", systemSize[0], systemSize[1]);
-	fprintf(fp,"%s\n", masterPassword);
+	fprintf(fp,"%s", masterPassword);
 	
 	int i,j;
 	for(i=0;i<systemSize[0];i++){
 		for(j=0;j<systemSize[1];j++){
 			if (deliverySystem[i][j].cnt>0)
-				fprintf(fp,"%d %d %d %d %s %s\n", i, j, deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd, deliverySystem[i][j].context);
+				fprintf(fp,"\n%d %d %d %d %s %s", i, j, deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd, deliverySystem[i][j].context);
 		}
 	}
 	
@@ -165,8 +165,6 @@ int str_createSystem(char* filepath) {
 		deliverySystem[x][y].cnt++;
 		storedCnt++;
 	}
-	//StoredCnt세주기(while문 안에 있을 떄,마지막 \n 를 뺌)  
-	//storedCnt--;
 	fclose(fp);											 
 
 	//successfully created	
